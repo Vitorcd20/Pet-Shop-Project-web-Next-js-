@@ -30,8 +30,8 @@ export const PeriodSection = ({period}: PeriodSectionProps) => {
         <div className="px-5">
           <div>
             <div className="grid grid-cols-2 md:hidden text-label-small-size text-content-secondary mb-2">
-              <div className="text-left">Horário</div>
-              <div className="text-right">Paciente</div>
+              <div className="text-left">Time</div>
+              <div className="text-right">Client</div>
             </div>
 
             {period.appointments.map((appointment, index) => (
@@ -40,7 +40,7 @@ export const PeriodSection = ({period}: PeriodSectionProps) => {
           </div>
         </div>
       ) : (
-        <p>Nenhum agendamento para este período</p>
+        <p>No scheduled appointments for this period</p>
       )}
 
     </section>
