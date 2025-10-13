@@ -1,9 +1,5 @@
 "use client";
 import { z } from "zod";
-
-import { Button } from "../ui/button";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +8,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Form } from "../ui/form";
+import { Button } from "../ui/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { Dog, User } from "lucide-react";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 const appointmentFormSchema = z.object({
   tutorName: z.string().min(3, "Tutor name is required"),
@@ -56,8 +65,80 @@ export const AppointmentForm = () => {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <input {...form.register("tutorName")} type="text" />
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="tutorName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-label-medium-size text-content-primary">
+                    Tutor&apos;s name
+                  </FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <User
+                        className="absolute left-3 top-1/2 -translate-y-1/2 transform text-content-brand"
+                        size={20}
+                      />
+                      <Input
+                        placeholder="Tutor's name"
+                        className="pl-10"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="petName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-label-medium-size text-content-primary">
+                    Pet name
+                  </FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Dog
+                        className="absolute left-3 top-1/2 -translate-y-1/2 transform text-content-brand"
+                        size={20}
+                      />
+                      <Input
+                        placeholder="Pet name"
+                        className="pl-10"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-label-medium-size text-content-primary">
+                    Service description
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Service description"
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit">Save</Button>
           </form>
         </Form>
       </DialogContent>
