@@ -15,7 +15,7 @@ const periodIcons = {
 export const PeriodSection = ({period}: PeriodSectionProps) => {
   return (
     <section className="mb-8 bg-background-tertiary rounded-xl">
-      <div className="flex items-center px-5 py-3 justify-between border-b border-[#2E2C30]">
+      <div className="flex items-center px-5 py-3 justify-between">
         <div className='flex items-center gap-2'>
             {periodIcons[period?.type]}
             <h2 className='text-label-large-size text-content-primary'>
@@ -36,7 +36,7 @@ export const PeriodSection = ({period}: PeriodSectionProps) => {
             </div>
 
             {period.appointments.map((appointment, index) => (
-              <AppointmentCard appointment={appointment} key={index} />
+              <AppointmentCard appointment={appointment} key={index} isFirstInSection={index === 0} />
             ))}
           </div>
         </div>
