@@ -1,8 +1,8 @@
 "use client";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, startOfDay, startOfToday } from "date-fns";
-import { CalendarIcon, ChevronDownIcon, Dog, Phone, User } from "lucide-react";
+import { format, setHours, setMinutes, startOfToday } from "date-fns";
+import { CalendarIcon, ChevronDownIcon, Clock, Dog, Phone, User } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { IMaskInput } from "react-imask";
 import { z } from "zod";
@@ -27,20 +27,37 @@ import { Input } from "../ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Textarea } from "../ui/textarea";
 import { Calendar } from "../ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
-const appointmentFormSchema = z.object({
-  tutorName: z.string().min(3, "Tutor name is required"),
-  petName: z.string().min(3, "Pet name is required"),
-  phone: z.string().min(11, "Phone number is required"),
-  description: z.string().min(3, "Description is required"),
-  scheduleAt: z
-    .date({
-      error: "Date is required",
-    })
-    .min(new Date(), {
-      message: "The date cannot be in the past",
-    }),
-});
+const appointmentFormSchema = z
+  .object({
+    tutorName: z.string().min(3, 'Tutor name is required'),
+    petName: z.string().min(3, 'Pet name is required'),
+    phone: z.string().min(11, 'Phone number is required'),
+    description: z.string().min(3, 'Description is required'),
+    scheduleAt: z
+      .date({
+        error: 'Date is required',
+      })
+      .min(startOfToday(), {
+        message: 'Date cannot be in the past',
+      }),
+    time: z.string().min(1, 'Time is required'),
+  })
+  .refine(
+    (data) => {
+      const [hour, minute] = data.time.split(':');
+      const scheduleDateTime = setMinutes(
+        setHours(data.scheduleAt, Number(hour)),
+        Number(minute)
+      );
+      return scheduleDateTime > new Date();
+    },
+    {
+      path: ['time'],
+      error: 'Time cannot be in the past',
+    }
+  );
 
 type AppointmentFormValue = z.infer<typeof appointmentFormSchema>;
 
@@ -225,6 +242,40 @@ export const AppointmentForm = () => {
               )}
             />
 
+            
+            <FormField
+              control={form.control}
+              name="time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-label-medium-size text-content-primary">
+                   Time
+                  </FormLabel>
+                  <FormControl>
+                  <Select
+                   onValueChange={field.onChange}
+                   value={field.value}
+                  >
+                    <SelectTrigger>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-content-brand" />
+                        <SelectValue placeholder="--:-- --" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TIME_OPTIONS.map((time) => (
+                        <SelectItem key={time} value={time}>
+                          {time}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <Button type="submit">Save</Button>
           </form>
         </Form>
@@ -232,3 +283,18 @@ export const AppointmentForm = () => {
     </Dialog>
   );
 };
+
+const generateTimeOptions = () => {
+  const times = []
+
+  for (let hour = 9; hour < 21; hour++) {
+    for(let minute = 0; minute < 60; minute+= 30) {
+      if(hour === 21 && minute > 0) break;
+      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+      times.push(timeString)
+    }
+  }
+  return times
+}
+
+const TIME_OPTIONS = generateTimeOptions();
