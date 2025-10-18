@@ -43,6 +43,7 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { toast } from "sonner";
+import { createAppointment } from "@/app/actions";
 
 const appointmentFormSchema = z
   .object({
@@ -89,13 +90,20 @@ export const AppointmentForm = () => {
     },
   });
 
-  const onSubmit = (data: AppointmentFormValue) => {
+  const onSubmit =  async (data: AppointmentFormValue) => {
     const [hour, minute] = data.time.split(":")
 
     const scheduleAt = new Date(data.scheduleAt)
     scheduleAt.setHours(Number(hour), Number(minute), 0,0);
 
     toast.success(`Appointment scheduled sucessfully`)
+
+    await createAppointment({
+      ...data,
+      scheduleAt
+    })
+
+
     console.log(data)
   };
 
