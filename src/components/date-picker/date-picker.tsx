@@ -1,15 +1,59 @@
+"use client";
+
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../ui/button";
 import { Popover, PopoverTrigger } from "../ui/popover";
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from "react";
+import { addDays, format, isValid } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export const DatePicker = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const dateParam = searchParams.get("date");
+
+  const getInicialDate = useCallback(() => {
+    if (!dateParam) return;
+
+    const [year, month, day] = dateParam.split("-").map(Number);
+    const parsedDate = new Date(year, month - 1, day);
+    if (!isValid(parsedDate)) return new Date();
+
+    return parsedDate;
+  }, [dateParam]);
+
+  const [date, setDate] = useState<Date | undefined>(getInicialDate);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  const updateURLWithDate = (selectedDate: Date | undefined) => {
+    if (!selectedDate) return;
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set("date", format(selectedDate, "yyyy-MM-dd"));
+    router.push(`${pathname}?${newParams.toString()}`);
+  };
+
+  const handleNavigateDay = (days: number) => {
+    const newDate = addDays(date || new Date(), days);
+    updateURLWithDate(newDate);
+  };
+
+  useEffect(() => {
+    const newDate = getInicialDate();
+
+    if (date?.getTime() !== newDate?.getTime()) {
+      setDate(newDate);
+    }
+  }, [date, getInicialDate]);
+
   return (
     <div className="flex items-center gap-2">
-      <Button variant="outline">
+      <Button variant="outline" onClick={() => handleNavigateDay(-1)}>
         <ChevronLeft className="h-4 w-4" />
       </Button>
 
-      <Popover>
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -17,14 +61,18 @@ export const DatePicker = () => {
           >
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-content-brand" />
-              <span>Select a date</span>
+              {date ? (
+                format(date, "PPP", { locale: ptBR })
+              ) : (
+                <span>Select a date</span>
+              )}
             </div>
             <ChevronDown className="h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
       </Popover>
 
-      <Button variant="outline">
+      <Button variant="outline" onClick={() => handleNavigateDay(1)}>
         <ChevronRight className="h-4 w-4" />
       </Button>
     </div>
