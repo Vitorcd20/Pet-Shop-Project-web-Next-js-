@@ -86,25 +86,28 @@ export const AppointmentForm = () => {
       phone: "",
       description: "",
       scheduleAt: undefined,
-      time: ''
+      time: "",
     },
   });
 
-  const onSubmit =  async (data: AppointmentFormValue) => {
-    const [hour, minute] = data.time.split(":")
+  const onSubmit = async (data: AppointmentFormValue) => {
+    const [hour, minute] = data.time.split(":");
 
-    const scheduleAt = new Date(data.scheduleAt)
-    scheduleAt.setHours(Number(hour), Number(minute), 0,0);
+    const scheduleAt = new Date(data.scheduleAt);
+    scheduleAt.setHours(Number(hour), Number(minute), 0, 0);
 
-    toast.success(`Appointment scheduled sucessfully`)
-
-    await createAppointment({
+    const result = await createAppointment({
       ...data,
-      scheduleAt
-    })
+      scheduleAt,
+    });
 
+    if (result?.error) {
+      toast.error(result.error);
+      return;
+    }
 
-    console.log(data)
+    toast.success(`Appointment scheduled sucessfully`);
+    form.reset();
   };
 
   return (
@@ -310,14 +313,17 @@ export const AppointmentForm = () => {
             </div>
 
             <div className="flex justify-end">
-              <Button variant='brand' type="submit" disabled={form.formState.isSubmitting}>
+              <Button
+                variant="brand"
+                type="submit"
+                disabled={form.formState.isSubmitting}
+              >
                 {form.formState.isSubmitting && (
-                  <Loader2 className="mr-2 h-4 2-4 animate-spin" /> 
+                  <Loader2 className="mr-2 h-4 2-4 animate-spin" />
                 )}
                 Book
               </Button>
             </div>
-
           </form>
         </Form>
       </DialogContent>
