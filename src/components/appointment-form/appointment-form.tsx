@@ -44,6 +44,7 @@ import {
 import { Textarea } from "../ui/textarea";
 import { toast } from "sonner";
 import { createAppointment } from "@/app/actions";
+import { useState } from "react";
 
 const appointmentFormSchema = z
   .object({
@@ -78,6 +79,8 @@ const appointmentFormSchema = z
 type AppointmentFormValue = z.infer<typeof appointmentFormSchema>;
 
 export const AppointmentForm = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   const form = useForm<AppointmentFormValue>({
     resolver: zodResolver(appointmentFormSchema),
     defaultValues: {
@@ -107,11 +110,13 @@ export const AppointmentForm = () => {
     }
 
     toast.success(`Appointment scheduled sucessfully`);
+    
+    setIsOpen(false)
     form.reset();
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="brand">New appointment</Button>
       </DialogTrigger>
