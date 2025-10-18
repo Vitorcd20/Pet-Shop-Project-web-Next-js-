@@ -118,6 +118,7 @@ export async function deleteAppointment(id: string) {
         id,
       },
     });
+    
     revalidatePath("/");
   } catch (error) {
     console.log(error);
