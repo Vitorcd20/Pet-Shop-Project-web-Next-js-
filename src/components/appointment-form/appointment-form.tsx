@@ -44,7 +44,8 @@ import {
 import { Textarea } from "../ui/textarea";
 import { toast } from "sonner";
 import { createAppointment } from "@/app/actions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Appointment } from "@/types/appointments";
 
 const appointmentFormSchema = z
   .object({
@@ -78,7 +79,15 @@ const appointmentFormSchema = z
 
 type AppointmentFormValue = z.infer<typeof appointmentFormSchema>;
 
-export const AppointmentForm = () => {
+type AppointmentFormProps = {
+  appointment?: Appointment;
+  children?: React.ReactNode;
+};
+
+export const AppointmentForm = ({
+  appointment,
+  children,
+}: AppointmentFormProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm<AppointmentFormValue>({
@@ -92,6 +101,10 @@ export const AppointmentForm = () => {
       time: "",
     },
   });
+
+  useEffect(() => {
+    form.reset(appointment);
+  }, [appointment, form]);
 
   const onSubmit = async (data: AppointmentFormValue) => {
     const [hour, minute] = data.time.split(":");
@@ -110,16 +123,14 @@ export const AppointmentForm = () => {
     }
 
     toast.success(`Appointment scheduled sucessfully`);
-    
-    setIsOpen(false)
+
+    setIsOpen(false);
     form.reset();
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="brand">New appointment</Button>
-      </DialogTrigger>
+      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
 
       <DialogContent
         variant="appointment"
