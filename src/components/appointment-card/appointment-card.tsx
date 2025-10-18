@@ -87,7 +87,7 @@ export const AppointmentCard = ({
         </AppointmentForm>
 
         <AlertDialog>
-          <AlertDialogTrigger>
+          <AlertDialogTrigger asChild>
             <Button variant="remove" size="icon">
               <DeleteIcon size={16} />
             </Button>
